@@ -9,12 +9,13 @@ using namespace std;
 int main(){
     
     setlocale(LC_ALL, "rus");
-    string path = "/examples/problem.txt";
+    string path = "/Users/nikitakorolev/Desktop/Прога/Практика/3 сем/Practice-3-term/Practice-3-term/examples_test3/problem.txt";
     ifstream file(path);
     
     int n; // Кол-во вершин
     file >> n;
     
+     
     // Координаты точек
     vector < pair<double, double> > coordinates;
     for(int i = 0; i < n; i++){
@@ -23,6 +24,8 @@ int main(){
         file >> y;
         coordinates.push_back({x,y});
     };
+    
+     
     
     int p; // Кол-во ребер
     file >> p;
@@ -48,7 +51,12 @@ int main(){
         int a, b;
         file >> a;
         file >> b;
+        cout<<"БЕЛЛМАН-ФОРД"<<endl;
         G.BellmanFord(a, b);
+        cout<<"ПЕРЕБОР"<<endl;
+        G.findShortestRouteEnum(a, b);
         cout<<endl;
     };
+    
+    
 };
