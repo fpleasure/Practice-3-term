@@ -13,8 +13,10 @@ class Graph{
 public:
     Graph(int V); // Конструктор
     void addEdge(int v1, int v2, double cost); // Добавить ребро
-    void findShortestRouteEnum(int v1, int v2);// Поиск кратчайшего пути от вершины v1  до v2
-    void BellmanFord(int v1, int v2); // Алгоритм Беллмана-Форда
+    bool dfs(int v1, int v2, vector<double>& distance, vector<int>& routes, vector<bool>& visited); // Алгоритм перебора
+    vector<int> findShortestRouteDFS(int v1, int v2); // Вывод наименьшего пути перебора
+    vector<int> BellmanFord(int v1, int v2); // Алгоритм Беллмана-Форда
+    
 };
 
 /*-------------------------*/
@@ -28,38 +30,40 @@ void Graph::addEdge(int v1, int v2, double cost){
     adj[v1].push_back({v2,cost});
 };
 
-void Graph::findShortestRouteEnum(int v1, int v2){
-    queue<int> qu; // Очередь вершин
-    vector<bool> visited(this->V+1, false); // Список посещенных вершин
-    vector<double> distance(this->V+1, 0); // Растояние от начальной вершины до всех остальных
-    vector<int> routes (this->V, -1);
+bool Graph::dfs(int v1, int v2, vector<double>& distance, vector<int>& routes, vector<bool>& visited) {
     
-    // Добавляем вершину в очередь
-    qu.push(v1);
+    if(v1 == v2) return true;
+    if(visited.at(v1)) return false;
+
+    visited.at(v1) = true;
     
-    while(!qu.empty()){
-        int ad = qu.front();
-        qu.pop();
-        
-        for(auto & item : adj[ad]){
-            
-            if((distance.at(item.first) > distance.at(ad)+item.second) or (!distance.at(item.first))){
+    for(auto & item : adj[v1]) {
+        if(!visited.at(item.first)) {
+            if((distance.at(item.first) > distance.at(v1)+item.second) or  (!distance.at(item.first))){
                 
-                distance.at(item.first) = distance.at(ad)+item.second;
-                // Сохраняем путь
-                routes.at(item.first) = ad;
+                distance.at(item.first) = distance.at(v1)+item.second;
                 
-                qu.push(item.first);
+                routes.at(item.first) = v1;
                 
-                visited.at(item.first) = true;
-                //cout<<ad<<endl;
+                
             }
             
-            if(item.first == v2){ // Проверка на конечную вершину
-                continue;
-            }
+            dfs(item.first, v2, distance, routes, visited);
+            
+            visited.at(item.first)=false;
+            
         }
-    };
+        
+    }
+    
+    return false;
+}
+
+vector<int> Graph::findShortestRouteDFS(int v1, int v2){
+    vector<bool> visited(this->V+1, false);
+    vector<double> distance(this->V, 0);
+    vector<int> routes (this->V, -1);
+    dfs(v1, v2, distance, routes, visited);
     
     vector<int> path;
         
@@ -83,9 +87,11 @@ void Graph::findShortestRouteEnum(int v1, int v2){
     
     
     cout << endl << "Расстояние: " << distance.at(v2) << endl;
-};
+    
+    return path;
+}
 
-void Graph::BellmanFord(int v1, int v2){
+vector<int> Graph::BellmanFord(int v1, int v2){
     const int INF = 1000000000;
     vector<double> distance(this->V, INF);
     vector<int> routes(this->V, -1);
@@ -105,6 +111,9 @@ void Graph::BellmanFord(int v1, int v2){
                     
                     any = true;
                     
+                    if(item.first == v2){ // Проверка на конечную вершину
+                        continue;
+                    }
                     
                 }
             }
@@ -136,6 +145,8 @@ void Graph::BellmanFord(int v1, int v2){
     
     
     cout << endl << "Расстояние: " << distance.at(v2) << endl;
+    
+    return path;
 };
 
 #endif
